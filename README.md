@@ -40,8 +40,7 @@ faceMask_detection/
 │   ├── test_images/            # Real-world benchmark test images
 │   ├── test_detector.py        # Model loading & integration tests
 │   └── test_utils.py           # Unit tests for image validation & drawing
-├── Dockerfile                  # Production container definition
-├── docker-compose.yml          # Single-command container deployment
+├── packages.txt                # Linux system dependencies for Streamlit Cloud
 ├── requirements.txt            # Pinned Python package dependencies
 └── README.md                   # System documentation & usage guide
 ```
@@ -79,32 +78,12 @@ faceMask_detection/
 
 ---
 
-### Option 2: Run with Docker
+### Option 2: Run in the Cloud (Streamlit Community Cloud)
 
-1. **Build the Container Image**:
-   ```bash
-   docker build -t facemask-detection:1.0.0 .
-   ```
-
-2. **Run the Container**:
-   ```bash
-   docker run -d -p 8501:8501 --name facemask_app facemask-detection:1.0.0
-   ```
-   Access the dashboard at **`http://localhost:8501`**.
-
----
-
-### Option 3: Run with Docker Compose
-
-To start the service in background daemon mode:
-```bash
-docker-compose up -d
-```
-
-To stop the service:
-```bash
-docker-compose down
-```
+1. Open **[share.streamlit.io](https://share.streamlit.io)**
+2. Click **New app** $\rightarrow$ select this repository.
+3. Set Main file path to: `src/app.py`
+4. Click **Deploy!**
 
 ---
 

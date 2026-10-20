@@ -73,8 +73,7 @@ st.markdown("""
 @st.cache_resource
 def get_detector():
     """Initializes and caches the face detector model in memory."""
-    models_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "models")
-    return load_face_detector(models_dir)
+    return load_face_detector()
 
 
 def render_sidebar(detector):

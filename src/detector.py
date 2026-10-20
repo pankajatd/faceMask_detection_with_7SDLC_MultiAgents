@@ -23,33 +23,69 @@ class FaceDetectorWrapper:
         self.model_obj = model_obj
 
 
-def load_face_detector(model_dir: str = "models") -> FaceDetectorWrapper:
+def load_face_detector(model_dir: Optional[str] = None) -> FaceDetectorWrapper:
     """
     Loads face detection model.
     Primary: Deep Learning SSD ResNet-10 (Caffe model).
-    Fallback: Built-in OpenCV Haar Cascade.
+    Fallback: Haar Cascade detector.
 
     Args:
-        model_dir (str): Directory where deep learning model files are stored.
+        model_dir (Optional[str]): Specific directory where deep learning model files are stored.
+                                   If None, automatically searches standard candidate directories.
 
     Returns:
         FaceDetectorWrapper: Initialized detector wrapper.
     """
-    prototxt_path = os.path.join(model_dir, "deploy.prototxt")
-    caffemodel_path = os.path.join(model_dir, "res10_300x300_ssd_iter_140000.caffemodel")
+    if model_dir is not None and model_dir != "models":
+        candidates = [model_dir]
+    else:
+        # Search all candidate directories for model files
+        candidates = [
+            "models",
+            os.path.abspath("models"),
+            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models"),
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "models"),
+            os.path.join(os.getcwd(), "models")
+        ]
+
+    prototxt_path = None
+    caffemodel_path = None
+    cascade_path = None
+
+    for d in candidates:
+        if d and os.path.exists(d):
+            p_proto = os.path.normpath(os.path.abspath(os.path.join(d, "deploy.prototxt")))
+            p_caffe = os.path.normpath(os.path.abspath(os.path.join(d, "res10_300x300_ssd_iter_140000.caffemodel")))
+            p_casc = os.path.normpath(os.path.abspath(os.path.join(d, "haarcascade_frontalface_default.xml")))
+
+            if prototxt_path is None and os.path.exists(p_proto):
+                prototxt_path = p_proto
+            if caffemodel_path is None and os.path.exists(p_caffe):
+                caffemodel_path = p_caffe
+            if cascade_path is None and os.path.exists(p_casc):
+                cascade_path = p_casc
 
     # 1. Try loading Deep Learning SSD (ResNet-10)
-    if os.path.exists(prototxt_path) and os.path.exists(caffemodel_path):
+    if prototxt_path and caffemodel_path:
         try:
             net = cv2.dnn.readNetFromCaffe(prototxt_path, caffemodel_path)
             return FaceDetectorWrapper("dnn_caffe", net)
-        except Exception:
-            pass  # Fall through to Haar Cascade fallback if loading failed
+        except Exception as e:
+            print(f"[WARNING] Caffe model loading failed: {e}")
 
-    # 2. Fallback: Load OpenCV Built-in Haar Cascade
-    cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-    cascade = cv2.CascadeClassifier(cascade_path)
-    return FaceDetectorWrapper("haar_cascade", cascade)
+    # 2. Fallback: Haar Cascade from models/
+    if cascade_path and os.path.exists(cascade_path):
+        cascade = cv2.CascadeClassifier(cascade_path)
+        return FaceDetectorWrapper("haar_cascade", cascade)
+
+    # 3. Fallback: OpenCV built-in data path (guarded with hasattr)
+    if hasattr(cv2, "data") and hasattr(cv2.data, "haarcascades"):
+        builtin_path = os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_default.xml")
+        if os.path.exists(builtin_path):
+            cascade = cv2.CascadeClassifier(builtin_path)
+            return FaceDetectorWrapper("haar_cascade", cascade)
+
+    return FaceDetectorWrapper("haar_cascade", cv2.CascadeClassifier())
 
 
 def classify_mask_region(face_roi: np.ndarray) -> Tuple[str, float]:

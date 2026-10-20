@@ -1,0 +1,27 @@
+# Internal agent frameworks and design plans
+.agents/
+plans/
+reports/
+scratch/
+output/
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+ENV/
+
+# Git metadata
+.git/
+.gitignore
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

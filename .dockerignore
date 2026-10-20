@@ -1,0 +1,7 @@
+# Ignore cache and local files when building Docker
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.git/
+.venv/
+output/

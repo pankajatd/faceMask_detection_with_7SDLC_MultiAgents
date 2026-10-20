@@ -41,6 +41,8 @@ faceMask_detection/
 │   ├── test_detector.py        # Model loading & integration tests
 │   └── test_utils.py           # Unit tests for image validation & drawing
 ├── packages.txt                # Linux system dependencies for Streamlit Cloud
+├── Dockerfile                  # Container build instructions (Mini-Linux + OpenCV)
+├── docker-compose.yml          # 1-click Docker launch configuration
 ├── requirements.txt            # Pinned Python package dependencies
 └── README.md                   # System documentation & usage guide
 ```
@@ -84,6 +86,21 @@ faceMask_detection/
 2. Click **New app** $\rightarrow$ select this repository.
 3. Set Main file path to: `src/app.py`
 4. Click **Deploy!**
+
+---
+
+### Option 3: Run with Docker Compose (On-Premise / Enterprise)
+
+1. **Start the Dashboard**:
+   ```bash
+   docker-compose up -d
+   ```
+   Open your browser to: **`http://localhost:8501`**
+
+2. **Stop the Dashboard**:
+   ```bash
+   docker-compose down
+   ```
 
 ---
 

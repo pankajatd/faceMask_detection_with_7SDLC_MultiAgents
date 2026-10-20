@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  facemask-detection:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: facemask-detection:1.0.0
+    container_name: facemask_app
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      - PYTHONUNBUFFERED=1

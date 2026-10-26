@@ -2,11 +2,11 @@
 
 [![Python Version](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
 [![Framework](https://img.shields.io/badge/Framework-Streamlit-FF4B4B.svg)](https://streamlit.io/)
-[![Deep Learning](https://img.shields.io/badge/Model-ResNet--10%20SSD-green.svg)](https://opencv.org/)
+[![Deep Learning](https://img.shields.io/badge/Model-MediaPipe%20BlazeFace%20(CNN)-green.svg)](https://ai.google.dev/edge/mediapipe/solutions/vision/face_detector)
 [![License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-25%2F25%20Passing-brightgreen.svg)]()
 
-An enterprise-ready, on-premise Computer Vision application that performs real-time face detection, protective mask verification, and workplace safety compliance auditing. Built using a deep-learning ResNet-10 Single Shot Multibox Detector (SSD) with an automatic OpenCV Haar Cascade fallback engine.
+An enterprise-ready, on-premise Computer Vision application that performs real-time face detection, protective mask verification, and workplace safety compliance auditing. Built using Google MediaPipe BlazeFace Deep Learning Convolutional Neural Network (CNN) with an automatic OpenCV Haar Cascade fallback engine.
 
 ---
 
@@ -104,9 +104,17 @@ faceMask_detection/
 
 ---
 
-## 🧪 Running Automated Tests
+## 🧪 Quality Assurance & Defect Governance (Gate 5)
 
-The codebase includes a comprehensive 25-point automated QA test suite covering happy paths, negative paths, boundary clipping, and corrupt inputs.
+The codebase includes a comprehensive 25-point automated QA test suite. This project strictly adheres to **Rule 2 Closed-Loop Defect Governance** (`QA Agent Logs Bug ➔ Software Developer Agent Resolves ➔ QA Agent Retests ➔ Closed`):
+
+| Defect Ticket | Code Logic Category | Failing Condition / Description | Developer Resolution | Defect Status |
+| :--- | :--- | :--- | :--- | :---: |
+| [**BUG-001**](reports/defects/BUG-001.md) | **Colorspace Math** | Inverted BGR/RGB channels made warm bare skin evaluate as a blue surgical mask | Enforced strict RGB normalization before channel math | 🟢 **CLOSED** |
+| [**BUG-002**](reports/defects/BUG-002.md) | **Geometry / Slicing** | Mask crop started at 70% height, cutting off nose on N95 respirators | Expanded anatomical crop to 55%–92% covering nose & mouth | 🟢 **CLOSED** |
+| [**BUG-003**](reports/defects/BUG-003.md) | **Feature Logic** | Dark mask check only evaluated brightness, mistaking human beards for black masks | Added texture variance check (`mean_std < 14.0`) to separate fabric from hair | 🟢 **CLOSED** |
+
+Full official test execution report: [qa-test-report.md](reports/qa-test-report.md) (**25 / 25 automated tests passed, 100% Pass Rate**).
 
 To execute tests:
 ```bash
@@ -115,7 +123,7 @@ pytest -v tests/
 
 **Expected Output**:
 ```
-======================== 25 passed in 0.80s ========================
+======================== 25 passed in 2.55s ========================
 ```
 
 ---

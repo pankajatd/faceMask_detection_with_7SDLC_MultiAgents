@@ -29,7 +29,7 @@
 
 | Test Identifier | Category | Input / Scenario Tested | Assertion / Criterion | Result |
 | :--- | :--- | :--- | :--- | :--- |
-| `test_load_primary_caffe_detector` | Lifecycle | Primary face detector initialization | Model wrapper initialized cleanly | ✅ PASS |
+| `test_load_primary_caffe_detector` | Lifecycle | Primary face detector initialization | Model wrapper initialized cleanly (Google MediaPipe BlazeFace CNN) | ✅ PASS |
 | `test_fallback_to_haar_cascade_when_weights_missing` | Resilience | Point to non-existent model path | Graceful fallback to Haar Cascade | ✅ PASS |
 | `test_empty_roi_returns_safe_default` | Boundary | Empty (0x0) face ROI | Returns safe default `("No Mask", 0.0)` | ✅ PASS |
 | `test_synthetic_surgical_blue_mask_roi` | Accuracy | Synthetic light blue surgical mask patch | Classifies as `Mask` with high confidence | ✅ PASS |

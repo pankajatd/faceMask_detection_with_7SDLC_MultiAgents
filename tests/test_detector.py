@@ -34,7 +34,7 @@ class TestModelLoading:
 
     def test_load_primary_caffe_detector(self, detector):
         assert isinstance(detector, FaceDetectorWrapper)
-        assert detector.model_type in ("dnn_caffe", "haar_cascade")
+        assert detector.model_type in ("mediapipe_blazeface", "dnn_caffe", "haar_cascade")
         assert detector.model_obj is not None
 
     def test_fallback_to_haar_cascade_when_weights_missing(self):

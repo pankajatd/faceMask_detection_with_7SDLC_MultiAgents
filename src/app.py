@@ -103,7 +103,10 @@ def render_sidebar(detector):
     st.sidebar.markdown("---")
     st.sidebar.markdown("### 🧠 AI Engine Status")
     
-    if detector.model_type == "dnn_caffe":
+    if detector.model_type == "mediapipe_blazeface":
+        st.sidebar.success("✅ **Google MediaPipe BlazeFace (CNN)** Active")
+        st.sidebar.caption("Deep Learning Convolutional Neural Network with multi-angle and profile resistance.")
+    elif detector.model_type == "dnn_caffe":
         st.sidebar.success("✅ **Primary DL SSD (ResNet-10)** Active")
         st.sidebar.caption("High-accuracy CNN with multi-angle, profile, and tilt resistance.")
     else:

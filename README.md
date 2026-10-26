@@ -15,38 +15,50 @@ Engineered end-to-end under the **`MASTER_SDLC_AGENTS`** autonomous multi-agent 
 
 ---
 
-## 🏛️ System Architecture: The Dual-Engine Pipeline
+## 🏛️ System Architecture: End-to-End Pipeline
 
-FaceMask-Guard enforces a strict architectural boundary decoupling media ingestion, deep learning perception, anatomical mask classification, and user presentation:
+The system processes video and photo streams through a clean 4-stage pipeline that separates media ingestion, deep learning face detection, mask classification, and user presentation:
 
 ```mermaid
-flowchart TD
-    subgraph Ingestion ["Media Ingestion Layer"]
-        A["Image Upload / Webcam Frame / Preset Benchmark"] --> B["load_and_validate_image()<br/>Strict RGB Normalization & Format Verification"]
+flowchart LR
+    %% 1. Ingestion Layer
+    subgraph S1 ["1. Input Ingestion"]
+        direction TB
+        IN["📷 Camera / Photo Upload"] --> NORM["🎨 RGB Normalizer<br/>(Colorspace Guard)"]
     end
 
-    subgraph Perception ["Perception Engine (src/detector.py)"]
-        B --> C{"Is Google MediaPipe<br/>BlazeFace Ready?"}
-        C -- "Yes (Primary)" --> D["Google MediaPipe BlazeFace CNN<br/>Sub-Millisecond Face Localization"]
-        C -- "No (Fallback)" --> E["OpenCV Multi-Scale Adaptive Pass<br/>cv2.equalizeHist + Haar Cascade"]
-        D & E --> F["Bounding Box Normalization & Facial ROI Extraction"]
+    %% 2. Detection Layer
+    subgraph S2 ["2. AI Face Detection"]
+        direction TB
+        NORM --> CNN["🧠 Primary AI Engine<br/>Google MediaPipe BlazeFace (CNN)"]
+        CNN -. "Fallback if needed" .-> CV["🛡️ OpenCV Adaptive Pass<br/>(cv2.equalizeHist)"]
+        CNN & CV --> CROP["✂️ Extract Lower Face ROI<br/>Nose Bridge down to Chin"]
     end
 
-    subgraph Classification ["Mask Classifier (src/detector.py)"]
-        F --> G["Anatomical Respiratory Zone Slicing<br/>(55% to 92% Height, 20% to 80% Width)"]
-        G --> H1["Surgical Blue: B > R + 15"]
-        G --> H2["N95 White: Brightness > 165 & |R - B| < 25"]
-        G --> H3["Black Cloth: Brightness < 65 & std < 14.0"]
-        G --> H4["Bare Skin: Warm Red Dominance (R >> B) & Hair Texture"]
-        H1 & H2 & H3 & H4 --> I["Decision Arbiter: 'Mask' vs 'No Mask' + Confidence Score"]
+    %% 3. Mask Classification Layer
+    subgraph S3 ["3. Mask Classification"]
+        direction TB
+        CROP --> FEAT{"Inspect Fabric vs Skin"}
+        FEAT -->|"Surgical / N95 / Dark Cloth"| MASK["✅ Mask Detected<br/>Smooth Fabric Texture"]
+        FEAT -->|"Warm Skin Pigment / Lips"| NOMASK["❌ No Mask Detected<br/>Bare Skin & Facial Features"]
     end
 
-    subgraph Presentation ["Dashboard & Reporting (src/app.py & src/utils.py)"]
-        I --> J["Dynamic HUD Bounding Boxes (Green = Compliant, Red = Non-Compliant)"]
-        I --> K["Real-Time Compliance KPI Cards & Live Streamlit Dashboard"]
-        I --> L["1-Click Annotated Image Export & Safety Audit Reports"]
+    %% 4. Dashboard & HUD Layer
+    subgraph S4 ["4. Live Safety Output"]
+        direction TB
+        MASK --> HUD1["🟩 Green Bounding Box<br/>'Mask: Compliant'"]
+        NOMASK --> HUD2["🟥 Red Bounding Box<br/>'No Mask: Alert'"]
+        HUD1 & HUD2 --> DASH["📊 Streamlit Web Console<br/>Safety KPI Cards & Export"]
     end
+
+    S1 --> S2 --> S3 --> S4
 ```
+
+### How the Pipeline Works in Plain English:
+1. **Input Ingestion:** The camera frame or uploaded photo is validated and converted to pure RGB colorspace to prevent channel inversion.
+2. **AI Face Detection:** Google MediaPipe BlazeFace CNN locates all human faces in sub-milliseconds. If running in an environment without MediaPipe, it seamlessly falls back to OpenCV.
+3. **Mask Classification:** The system crops the lower facial zone (from the bridge of the nose to the chin) and audits fabric characteristics against bare human skin tone and texture.
+4. **Live Safety Output:** Renders instant visual feedback on the Streamlit dashboard with **Green Bounding Boxes** for compliant individuals, **Red Bounding Boxes** for unmasked individuals, and live workplace compliance percentage KPIs.
 
 ---
 

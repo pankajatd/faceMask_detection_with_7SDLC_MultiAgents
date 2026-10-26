@@ -219,11 +219,21 @@ def detect_and_classify_frame(
         gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
         rects = detector.model_obj.detectMultiScale(
             gray,
-            scaleFactor=1.1,
-            minNeighbors=5,
+            scaleFactor=1.08,
+            minNeighbors=3,
             minSize=(30, 30),
             flags=cv2.CASCADE_SCALE_IMAGE
         )
+        if len(rects) == 0:
+            # Multi-scale adaptive equalization pass for occluded / profile faces
+            gray_eq = cv2.equalizeHist(gray)
+            rects = detector.model_obj.detectMultiScale(
+                gray_eq,
+                scaleFactor=1.05,
+                minNeighbors=2,
+                minSize=(25, 25),
+                flags=cv2.CASCADE_SCALE_IMAGE
+            )
         for (x, y, w, h) in rects:
             faces_detected.append((x, y, x + w, y + h))
 

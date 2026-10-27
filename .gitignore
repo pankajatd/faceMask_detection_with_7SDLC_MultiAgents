@@ -1,6 +1,5 @@
 # Internal agent prompt files and SDLC plans
 .agents/
-plans/
 
 # Python bytecode & cache
 __pycache__/
